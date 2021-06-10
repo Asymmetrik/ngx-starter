@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { PagingModule, PagingResults } from 'src/app/common/paging.module';
 import { PipesModule } from 'src/app/common/pipes.module';
 import { SearchInputModule } from 'src/app/common/search-input.module';
@@ -14,9 +14,11 @@ import { ConfigService } from '../../config.service';
 import { ExportConfigService } from '../../export-config.service';
 import { AdminListUsersComponent } from './admin-list-users.component';
 import { AdminUsersService } from './admin-users.service';
+import { SystemAlertService } from '../../../common/system-alert.module';
 
 describe('Admin List Users Component Spec', () => {
 	let adminUsersServiceSpy: any;
+	let alertServiceSpy: any;
 	let configServiceSpy: any;
 	let exportConfigServiceSpy: any;
 	let exportResponseId: string;
@@ -61,7 +63,7 @@ describe('Admin List Users Component Spec', () => {
 		exportResponseId = `${Math.random()}`;
 
 		// reset for each test
-		adminUsersServiceSpy = jasmine.createSpyObj('AdminUsersService', ['search']);
+		adminUsersServiceSpy = jasmine.createSpyObj('AdminUsersService', ['search', 'removeUser']);
 		adminUsersServiceSpy.cache = {
 			listUsers: {}
 		};
@@ -77,6 +79,11 @@ describe('Admin List Users Component Spec', () => {
 			})
 		);
 
+		alertServiceSpy = jasmine.createSpyObj('SystemAlertService', [
+			'addClientErrorAlert',
+			'clearAllAlerts'
+		]);
+
 		TestBed.configureTestingModule({
 			declarations: [AdminListUsersComponent],
 			imports: [
@@ -91,7 +98,8 @@ describe('Admin List Users Component Spec', () => {
 			providers: [
 				{ provide: AdminUsersService, useValue: adminUsersServiceSpy },
 				{ provide: ConfigService, useValue: configServiceSpy },
-				{ provide: ExportConfigService, useValue: exportConfigServiceSpy }
+				{ provide: ExportConfigService, useValue: exportConfigServiceSpy },
+				{ provide: SystemAlertService, useValue: alertServiceSpy }
 			]
 		});
 
@@ -180,5 +188,29 @@ describe('Admin List Users Component Spec', () => {
 			sort: 'lastLogin',
 			dir: 'DESC'
 		});
+	});
+
+	it('should call the api to delete a user', done => {
+		component.load$.subscribe({
+			next: () => {
+				done();
+			}
+		});
+		expect(adminUsersServiceSpy.removeUser).toHaveBeenCalledTimes(0);
+		adminUsersServiceSpy.removeUser.and.returnValue(of());
+		const fakeUser = { userModel: { _id: 1 } };
+		component.confirmDeleteUser(fakeUser as any);
+		expect(adminUsersServiceSpy.removeUser).toHaveBeenCalledTimes(1);
+		expect(adminUsersServiceSpy.removeUser).toHaveBeenCalledWith(1);
+		fixture.detectChanges();
+	});
+
+	it('should defer errors to the alert service for deletions', () => {
+		adminUsersServiceSpy.removeUser.and.returnValue(throwError('error'));
+		const fakeUser = { userModel: { _id: 1 } };
+		component.confirmDeleteUser(fakeUser as any);
+		fixture.detectChanges();
+		expect(alertServiceSpy.addClientErrorAlert).toHaveBeenCalledTimes(1);
+		expect(alertServiceSpy.addClientErrorAlert).toHaveBeenCalledWith('error');
 	});
 });

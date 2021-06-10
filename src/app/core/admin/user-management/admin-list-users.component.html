@@ -134,6 +134,7 @@
 					<td class="text-right" style="max-width: 50px;">
 						<span class="dropdown border-left pl-2 py-1" container="body" dropdown>
 							<span
+								id="drop"
 								class="dropdown-toggle dropdown-toggle-hide-caret px-2"
 								style="cursor: pointer;"
 								dropdownToggle
@@ -149,7 +150,9 @@
 									>
 								</li>
 								<li>
-									<a class="dropdown-item" (click)="confirmDeleteUser(user)"
+									<a
+										class="dropdown-item delete"
+										(click)="confirmDeleteUser(user)"
 										>Delete</a
 									>
 								</li>
