@@ -31,8 +31,7 @@ export class SystemAlertService {
 	}
 
 	addAlert(msg: string, type?: string, ttl?: number, subtext?: string) {
-		type = type || this.defaultType;
-		const alert = new SystemAlert(this.id++, type || this.defaultType, msg, subtext || null);
+		const alert = new SystemAlert(this.id++, type || this.defaultType, msg, subtext);
 
 		this.alerts.push(alert);
 

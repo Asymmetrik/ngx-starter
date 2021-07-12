@@ -5,7 +5,7 @@ import { SystemAlertService } from '../../common/system-alert.module';
 
 import { untilDestroyed, UntilDestroy } from '@ngneat/until-destroy';
 import { of, BehaviorSubject, Observable } from 'rxjs';
-import { catchError, filter, first } from 'rxjs/operators';
+import { catchError, filter, first, map, tap } from 'rxjs/operators';
 import { NULL_PAGING_RESULTS, PagingOptions, PagingResults } from 'src/app/common/paging.module';
 import { AuthorizationService } from '../auth/authorization.service';
 import { Session } from '../auth/session.model';
@@ -38,32 +38,34 @@ export class MessageService {
 				first(() => authorizationService.isUser()),
 				untilDestroyed(this)
 			)
-			.subscribe((session: Session) => {
+			.subscribe(() => {
 				this.initialize();
 				this.updateNewMessageIndicator();
 			});
 	}
 
-	create(message: Message): Observable<Message> {
-		return this.http
-			.post<Message>('api/admin/message', JSON.stringify(message), { headers: this.headers })
-			.pipe(
-				catchError((error: HttpErrorResponse) => {
-					this.alertService.addClientErrorAlert(error);
-					return of(null);
-				})
-			);
+	mapToType(model: any): Message {
+		return new Message().setFromModel(model);
 	}
 
-	get(id: string): Observable<Message> {
-		return this.http
-			.get<Message>(`api/admin/message/${id}`, { headers: this.headers })
-			.pipe(
-				catchError((error: HttpErrorResponse) => {
-					this.alertService.addClientErrorAlert(error);
-					return of(null);
-				})
-			);
+	create(message: Message): Observable<Message | null> {
+		return this.http.post('api/admin/message', message, { headers: this.headers }).pipe(
+			map(this.mapToType),
+			catchError((error: HttpErrorResponse) => {
+				this.alertService.addClientErrorAlert(error);
+				return of(null);
+			})
+		);
+	}
+
+	get(id: string): Observable<Message | null> {
+		return this.http.get(`api/admin/message/${id}`, { headers: this.headers }).pipe(
+			map(this.mapToType),
+			catchError((error: HttpErrorResponse) => {
+				this.alertService.addClientErrorAlert(error);
+				return of(null);
+			})
+		);
 	}
 
 	/**
@@ -80,12 +82,13 @@ export class MessageService {
 			);
 	}
 
-	update(message: Message): Observable<Message> {
+	update(message: Message): Observable<Message | null> {
 		return this.http
-			.post<Message>(`api/admin/message/${message._id}`, JSON.stringify(message), {
+			.post(`api/admin/message/${message._id}`, message, {
 				headers: this.headers
 			})
 			.pipe(
+				map(this.mapToType),
 				catchError((error: HttpErrorResponse) => {
 					this.alertService.addClientErrorAlert(error);
 					return of(null);
@@ -93,15 +96,14 @@ export class MessageService {
 			);
 	}
 
-	remove(id: string): Observable<Message> {
-		return this.http
-			.delete<Message>(`api/admin/message/${id}`, { headers: this.headers })
-			.pipe(
-				catchError((error: HttpErrorResponse) => {
-					this.alertService.addClientErrorAlert(error);
-					return of(null);
-				})
-			);
+	remove(message: Pick<Message, '_id'>): Observable<Message | null> {
+		return this.http.delete(`api/admin/message/${message._id}`, { headers: this.headers }).pipe(
+			map(this.mapToType),
+			catchError((error: HttpErrorResponse) => {
+				this.alertService.addClientErrorAlert(error);
+				return of(null);
+			})
+		);
 	}
 
 	search(
@@ -110,12 +112,15 @@ export class MessageService {
 		paging: PagingOptions = new PagingOptions()
 	): Observable<PagingResults<Message>> {
 		return this.http
-			.post<PagingResults<Message>>(
+			.post<PagingResults>(
 				'api/messages',
 				{ q: query, s: search },
 				{ headers: this.headers, params: paging.toObj() }
 			)
 			.pipe(
+				tap(pagingResult => {
+					pagingResult.elements = pagingResult.elements.map(this.mapToType);
+				}),
 				catchError((error: HttpErrorResponse) => {
 					this.alertService.addClientErrorAlert(error);
 					return of(NULL_PAGING_RESULTS);
@@ -127,7 +132,7 @@ export class MessageService {
 		return this.http.post<any>('api/messages/recent', {}, { headers: this.headers }).pipe(
 			catchError((error: HttpErrorResponse) => {
 				this.alertService.addClientErrorAlert(error);
-				return of(null);
+				return of([]);
 			})
 		);
 	}

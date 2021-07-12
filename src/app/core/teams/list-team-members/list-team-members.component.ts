@@ -44,7 +44,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 
 	teamRoleOptions: any[] = TeamRole.ROLES;
 
-	user: User;
+	user: User | null;
 
 	headers: SortableTableHeader[] = [
 		{
@@ -70,7 +70,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 
 	headersToShow: SortableTableHeader[] = [];
 
-	private modalRef: BsModalRef;
+	private modalRef: BsModalRef | null = null;
 
 	constructor(
 		private bsModalService: BsModalService,
@@ -96,7 +96,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 			.getSession()
 			.pipe(untilDestroyed(this))
 			.subscribe(session => {
-				this.user = session.user;
+				this.user = session?.user ?? null;
 				this.isUserAdmin = this.authorizationService.isAdmin();
 			});
 
@@ -152,9 +152,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 			.pipe(
 				first(),
 				filter(action => action === ModalAction.OK),
-				switchMap(() =>
-					this.teamsService.removeMember(this.team._id, member.userModel._id)
-				),
+				switchMap(() => this.teamsService.removeMember(this.team, member.userModel._id)),
 				tap(() => this.authenticationService.reloadCurrentUser()),
 				catchError((error: HttpErrorResponse) => {
 					this.alertService.addClientErrorAlert(error);
@@ -173,7 +171,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 
 		// If user is removing their own admin, verify that they know what they're doing
 		if (
-			this.user.userModel._id === member.userModel._id &&
+			this?.user?.userModel._id === member.userModel._id &&
 			member.role === 'admin' &&
 			role !== 'admin'
 		) {
@@ -221,7 +219,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 		}
 
 		this.teamsService
-			.addMember(this.team._id, member.userModel._id, role)
+			.addMember(this.team, member.userModel._id, role)
 			.pipe(
 				tap(() => this.authenticationService.reloadCurrentUser()),
 				catchError((error: HttpErrorResponse) => {
@@ -244,7 +242,7 @@ export class ListTeamMembersComponent extends AbstractPageableDataComponent<Team
 			return of(member);
 		}
 
-		return this.teamsService.updateMemberRole(this.team._id, member.userModel._id, role);
+		return this.teamsService.updateMemberRole(this.team, member.userModel._id, role);
 	}
 
 	private reloadTeamMembers() {

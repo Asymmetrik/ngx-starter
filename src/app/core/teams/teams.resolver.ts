@@ -5,10 +5,14 @@ import { Team } from './team.model';
 import { TeamsService } from './teams.service';
 
 @Injectable()
-export class TeamsResolve implements Resolve<Team> {
+export class TeamsResolve implements Resolve<Team | null> {
 	constructor(private teamsService: TeamsService) {}
 
 	resolve(route: ActivatedRouteSnapshot) {
-		return this.teamsService.get(route.paramMap.get('id'));
+		const id = route.paramMap.get('id');
+		if (id == null) {
+			return null;
+		}
+		return this.teamsService.get(id);
 	}
 }

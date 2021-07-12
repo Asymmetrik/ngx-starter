@@ -20,7 +20,7 @@ export class TeamMember extends User {
 		return this.userModel.teams.length > 0;
 	}
 
-	public getRoleInTeam(team: Team | { _id: string }): string {
+	public getRoleInTeam(team: Pick<Team, '_id'>): string | null {
 		if (null != this.userModel && null != team) {
 			const teams = this?.userModel?.teams ?? [];
 			// Find the role of this user in the team
@@ -34,7 +34,7 @@ export class TeamMember extends User {
 		return null;
 	}
 
-	public setFromTeamMemberModel(team: Team, userModel: any): TeamMember {
+	public setFromTeamMemberModel(team: Team | null, userModel: any): TeamMember {
 		// Set the user model
 		super.setFromUserModel(userModel);
 
@@ -44,15 +44,15 @@ export class TeamMember extends User {
 				this.userModel.teams = [];
 			}
 
-			this.role = this.getRoleInTeam(team) ?? TeamRole.VIEW_ONLY.role;
-			this.roleDisplay = TeamRole.getDisplay(this.role);
-
 			// Determine if user is implicit/explicit and active/inactive
 			this.explicit = (userModel.teams?.length ?? 0) > 0;
 
 			if (userModel.bypassAccessCheck) {
 				this.active = true;
 			} else if (null != team) {
+				this.role = this.getRoleInTeam(team) ?? TeamRole.VIEW_ONLY.role;
+				this.roleDisplay = TeamRole.getDisplay(this.role);
+
 				this.explicit = userModel.teams.map((t: any) => t._id).includes(team._id);
 
 				this.active =

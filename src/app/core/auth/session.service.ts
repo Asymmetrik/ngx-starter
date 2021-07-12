@@ -13,7 +13,7 @@ import { User } from './user.model';
 @Injectable()
 export class SessionService {
 	// The current session information
-	sessionSubject = new BehaviorSubject<Session>(null);
+	sessionSubject = new BehaviorSubject<Session | null>(null);
 
 	// Previous url to store in case we want to redirect there later
 	private previousUrl: string;
@@ -68,7 +68,7 @@ export class SessionService {
 				return of(null);
 			}),
 			tap((eua: any) => {
-				this.sessionSubject.value.user.setEua(eua);
+				this.sessionSubject.value?.user.setEua(eua);
 				this.sessionSubject.next(this.sessionSubject.value);
 			})
 		);
@@ -90,7 +90,7 @@ export class SessionService {
 		this.sessionSubject.next(null);
 	}
 
-	getSession(): Observable<Session> {
+	getSession(): Observable<Session | null> {
 		return this.sessionSubject;
 	}
 

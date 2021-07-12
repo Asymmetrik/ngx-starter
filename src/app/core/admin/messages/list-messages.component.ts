@@ -90,8 +90,6 @@ export class ListMessagesComponent extends AbstractPageableDataComponent<Message
 	}
 
 	confirmDeleteMessage(message: Message) {
-		const id = message._id;
-
 		this.modalService
 			.confirm(
 				'Delete message?',
@@ -101,7 +99,7 @@ export class ListMessagesComponent extends AbstractPageableDataComponent<Message
 			.pipe(
 				first(),
 				filter(action => action === ModalAction.OK),
-				switchMap(() => this.messageService.remove(id)),
+				switchMap(() => this.messageService.remove(message)),
 				untilDestroyed(this)
 			)
 			.subscribe(

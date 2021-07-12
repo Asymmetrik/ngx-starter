@@ -12,7 +12,7 @@ import { Message } from '../../messages/message.class';
 
 export abstract class ManageMessageComponent implements OnInit {
 	message: Message;
-	error: string = null;
+	error?: string;
 	okDisabled: boolean;
 
 	// Variables that will be set by implementing classes

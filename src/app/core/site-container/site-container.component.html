@@ -4,7 +4,7 @@
 
 <!-- Site Header -->
 <header class="site-header">
-	<div class="site-banner" *ngIf="null != bannerHtml">
+	<div class="site-banner" *ngIf="bannerHtml">
 		<div class="header-banner" [innerHtml]="bannerHtml"></div>
 	</div>
 </header>
@@ -12,8 +12,8 @@
 <!-- Site content -->
 <section
 	[ngClass]="{
-		'header-active footer-active': null != bannerHtml,
-		'copyright-active': null != copyrightHtml
+		'header-active footer-active': bannerHtml,
+		'copyright-active': copyrightHtml
 	}"
 >
 	<site-navbar>
@@ -25,11 +25,11 @@
 
 <!-- Site Footer -->
 <footer class="site-footer">
-	<div class="site-banner" *ngIf="null != copyrightHtml">
+	<div class="site-banner" *ngIf="copyrightHtml">
 		<div class="copyright-banner" [innerHtml]="copyrightHtml"></div>
 	</div>
 
-	<div class="site-banner" *ngIf="null != bannerHtml">
+	<div class="site-banner" *ngIf="bannerHtml">
 		<div class="footer-banner" [innerHtml]="bannerHtml"></div>
 	</div>
 </footer>

@@ -22,7 +22,6 @@ export class TeamRole {
 	}
 
 	static getDisplay(role: string): string {
-		const teamRole: TeamRole = TeamRole.ROLES.find((tr: TeamRole) => tr.role === role);
-		return null != teamRole ? teamRole.label : 'Unknown';
+		return TeamRole.ROLES.find((tr: TeamRole) => tr.role === role)?.label ?? 'Unknown';
 	}
 }

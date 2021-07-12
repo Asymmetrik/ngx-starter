@@ -27,7 +27,7 @@ export class QuickFiltersComponent implements OnInit {
 
 	@Output() readonly filtersChange: EventEmitter<any> = new EventEmitter();
 
-	columnMode: string = null;
+	columnMode?: string;
 
 	shown = true;
 

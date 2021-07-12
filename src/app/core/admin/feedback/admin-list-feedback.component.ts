@@ -129,7 +129,8 @@ export class AdminListFeedbackComponent extends AbstractPageableDataComponent<an
 	columnsUpdated(updatedColumns: ColumnConfig) {
 		this.columns = cloneDeep(updatedColumns);
 		this.headersToShow = this.headers.filter(
-			(header: SortableTableHeader) => this.columns?.[header.sortField].show
+			(header: SortableTableHeader) =>
+				header.sortField && this.columns?.[header.sortField].show
 		);
 	}
 

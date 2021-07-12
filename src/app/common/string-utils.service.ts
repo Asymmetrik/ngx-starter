@@ -32,9 +32,6 @@ export class StringUtils {
 	}
 
 	public static hyphenToHuman(s: string) {
-		if (null == s) {
-			return null;
-		}
 		const result = s.replace(/-/g, ' ');
 		return StringUtils.toTitleCase(result);
 	}

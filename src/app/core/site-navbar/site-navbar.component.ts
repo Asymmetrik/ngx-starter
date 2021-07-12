@@ -7,7 +7,6 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { first } from 'rxjs/operators';
 import { Session } from '../auth/session.model';
 import { SessionService } from '../auth/session.service';
-import { Config } from '../config.model';
 import { ConfigService } from '../config.service';
 import { FeedbackModalComponent } from '../feedback/feedback.module';
 import { MessageService } from '../messages/message.service';
@@ -35,9 +34,9 @@ export class SiteNavbarComponent implements OnInit {
 	showFeedbackOption = true;
 
 	showUserPreferencesLink = false;
-	userPreferencesLink: string = null;
+	userPreferencesLink?: string;
 
-	session: Session = null;
+	session: Session | null = null;
 
 	adminMenuItems: AdminTopic[];
 
@@ -80,9 +79,9 @@ export class SiteNavbarComponent implements OnInit {
 		this.configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
+			.subscribe(config => {
 				this.showApiDocsLink = config?.apiDocs?.enabled ?? false;
-				this.apiDocsLink = config?.apiDocs?.path ?? null;
+				this.apiDocsLink = config?.apiDocs?.path ?? '';
 				this.showFeedbackOption = config?.feedback?.showInSidebar ?? true;
 				this.showUserPreferencesLink = config?.userPreferences?.enabled ?? false;
 				this.userPreferencesLink = config?.userPreferences?.path ?? '';

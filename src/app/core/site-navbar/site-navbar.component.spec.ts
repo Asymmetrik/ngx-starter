@@ -117,7 +117,7 @@ describe('Site Navbar Component Spec', () => {
 
 			expect(component.helpNavOpen).toEqual(true);
 			expect(component.showApiDocsLink).toEqual(false);
-			expect(component.apiDocsLink).toEqual(null);
+			expect(component.apiDocsLink).toEqual('');
 
 			/*
 			 * TODO Unclear how to test that the popover contents do NOT

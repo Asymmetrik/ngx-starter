@@ -13,7 +13,7 @@ import { ConfigService } from '../../config.service';
 
 export abstract class ManageUserComponent implements OnInit {
 	config: any;
-	error: string = null;
+	error?: string;
 	proxyPki: boolean;
 	metadataLocked: boolean;
 	okDisabled: boolean;

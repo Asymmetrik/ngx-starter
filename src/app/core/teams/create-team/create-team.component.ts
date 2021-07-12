@@ -33,11 +33,11 @@ export class CreateTeamComponent implements OnInit {
 	team: Team = new Team();
 
 	nestedTeamsEnabled = false;
-	implicitMembersStrategy: string = null;
+	implicitMembersStrategy?: string;
 
 	isAdmin = false;
 
-	teamAdmin: User;
+	teamAdmin: User | null;
 
 	usersLoading = false;
 	usersInput$ = new Subject<string>();
@@ -45,7 +45,7 @@ export class CreateTeamComponent implements OnInit {
 
 	isSubmitting = false;
 
-	private user: User;
+	private user: User | null;
 
 	private pagingOptions: PagingOptions = new PagingOptions();
 
@@ -67,7 +67,7 @@ export class CreateTeamComponent implements OnInit {
 		this.configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
+			.subscribe(config => {
 				this.implicitMembersStrategy = config?.teams?.implicitMembers?.strategy;
 				this.nestedTeamsEnabled = config?.teams?.nestedTeams ?? false;
 			});
@@ -76,7 +76,7 @@ export class CreateTeamComponent implements OnInit {
 			.getSession()
 			.pipe(untilDestroyed(this))
 			.subscribe(session => {
-				this.user = session.user;
+				this.user = session?.user ?? null;
 				this.isAdmin = this.authorizationService.isAdmin();
 				if (!this.isAdmin) {
 					this.setCurrentUserAsAdmin();
@@ -88,10 +88,11 @@ export class CreateTeamComponent implements OnInit {
 				untilDestroyed(this),
 				filter(params => params.has('parent')),
 				map(params => params.get('parent')),
+				filter((id: string | null): id is string => id !== null),
 				switchMap(id => this.teamsService.get(id))
 			)
-			.subscribe((parent: Team) => {
-				this.team.parent = parent;
+			.subscribe(parent => {
+				this.team.parent = parent ?? undefined;
 			});
 
 		if (this.isAdmin) {
@@ -124,7 +125,7 @@ export class CreateTeamComponent implements OnInit {
 	save() {
 		this.isSubmitting = true;
 		this.teamsService
-			.create(this.team, this.teamAdmin.userModel._id)
+			.create(this.team, this?.teamAdmin?.userModel._id)
 			.pipe(
 				tap(() => this.authenticationService.reloadCurrentUser()),
 				untilDestroyed(this)

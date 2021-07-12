@@ -27,7 +27,7 @@ export class HelpTopics {
 			.map((v: any) => v.key);
 	}
 
-	static getTopicTitle(title: string, short: boolean = false): string {
+	static getTopicTitle(title: string, short: boolean = false) {
 		return StringUtils.hyphenToHuman(title);
 	}
 }

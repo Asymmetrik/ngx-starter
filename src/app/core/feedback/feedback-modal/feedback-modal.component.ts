@@ -16,7 +16,7 @@ import { FeedbackService } from '../feedback.service';
 	styleUrls: ['feedback-modal.component.scss']
 })
 export class FeedbackModalComponent implements OnInit {
-	error: string;
+	error: string | null;
 
 	success: string;
 

@@ -73,7 +73,7 @@ export class AddMembersModalComponent implements OnInit {
 
 		// Add users who are already in the system
 		this.teamsService
-			.addMembers(this.addedMembers, this.teamId)
+			.addMembers(this.addedMembers, { _id: this.teamId })
 			.pipe(untilDestroyed(this))
 			.subscribe(() => {
 				this.submitting = false;

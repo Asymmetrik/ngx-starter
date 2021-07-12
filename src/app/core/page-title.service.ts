@@ -4,13 +4,16 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 import { untilDestroyed, UntilDestroy } from '@ngneat/until-destroy';
 import capitalize from 'lodash/capitalize';
+import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
-import { filter, first, map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
 
 @UntilDestroy()
 @Injectable()
 export class PageTitleService {
+	appTitle: string | null = null;
+
 	constructor(
 		private configService: ConfigService,
 		private router: Router,
@@ -21,49 +24,49 @@ export class PageTitleService {
 	init() {
 		this.configService
 			.getConfig()
-			.pipe(first(), untilDestroyed(this))
-			.subscribe(config => {
-				const appTitle = config?.app?.title;
-
-				this.router.events
-					.pipe(
-						filter(event => event instanceof NavigationEnd),
-						map(() => this.activatedRoute),
-						map(route => {
-							// Get to the leaf route
-							while (null != route.firstChild) {
-								route = route.firstChild;
-							}
-							return route;
-						}),
-						switchMap(route => route.data),
-						map(data => {
-							try {
-								let pathTitle = data.title;
-
-								// If there wasn't a path title, try to generate one
-								if (null == pathTitle) {
-									pathTitle = this.router.url
-										.split(';')[0]
-										.split('/')
-										.slice(1)
-										.map(frag => capitalize(frag))
-										.join(' > ');
-								}
-
-								if (isEmpty(appTitle) || isEmpty(pathTitle)) {
-									return `${appTitle}${pathTitle}`;
-								} else {
-									return `${appTitle} - ${pathTitle}`;
-								}
-							} catch {
-								return appTitle;
-							}
-						})
-					)
-					.subscribe((title: string) => {
-						this.titleService.setTitle(title);
-					});
+			.pipe(
+				tap(config => {
+					this.appTitle = get(config, 'app.title', null);
+				}),
+				switchMap(() => this.router.events),
+				filter(event => event instanceof NavigationEnd),
+				map(() => {
+					let route = this.activatedRoute;
+					// Get to the leaf route
+					while (null != route.firstChild) {
+						route = route.firstChild;
+					}
+					return route;
+				}),
+				switchMap(route => route.data),
+				map(data => {
+					const pathTitle = this.generatePathTitle(data);
+					if (isEmpty(this.appTitle) || isEmpty(pathTitle)) {
+						return `${this.appTitle}${pathTitle}`;
+					}
+					return `${this.appTitle} - ${pathTitle}`;
+				}),
+				untilDestroyed(this)
+			)
+			.subscribe((title: string) => {
+				this.titleService.setTitle(title);
 			});
+	}
+
+	generatePathTitle(data: any) {
+		// If there wasn't a path title, try to generate one
+		if (null == data.title) {
+			try {
+				return this.router.url
+					.split(';')[0]
+					.split('/')
+					.slice(1)
+					.map(frag => capitalize(frag))
+					.join(' > ');
+			} catch {
+				// no-op
+			}
+		}
+		return data.title;
 	}
 }

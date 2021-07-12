@@ -142,6 +142,7 @@ export class AdminListUsersComponent extends AbstractPageableDataComponent<User>
 
 				this.headersToShow = this.headers.filter(
 					(header: SortableTableHeader) =>
+						header.sortField &&
 						this.columns.hasOwnProperty(header.sortField) &&
 						this.columns[header.sortField].show
 				);
@@ -199,7 +200,8 @@ export class AdminListUsersComponent extends AbstractPageableDataComponent<User>
 	columnsUpdated(updatedColumns: ColumnConfig) {
 		this.columns = cloneDeep(updatedColumns);
 		this.headersToShow = this.headers.filter(
-			(header: SortableTableHeader) => this.columns?.[header.sortField].show
+			(header: SortableTableHeader) =>
+				header.sortField && this.columns?.[header.sortField].show
 		);
 	}
 

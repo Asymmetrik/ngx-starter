@@ -58,7 +58,7 @@ describe('SystemAlertService', () => {
 			const newAlert = alerts[alerts.length - 1];
 			expect(newAlert.msg).toBe(newAlertMsg);
 			expect(newAlert.type).toBe('danger');
-			expect(newAlert.subtext).toBeNull();
+			expect(newAlert.subtext).toBeUndefined();
 		});
 
 		it('new alert is created with additional details', () => {

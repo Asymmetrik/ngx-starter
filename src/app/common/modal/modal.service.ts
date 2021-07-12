@@ -10,7 +10,7 @@ import { ContainerModalConfig, ModalAction, ModalCloseEvent, ModalConfig } from 
 
 @Injectable()
 export class ModalService {
-	private modalRef: BsModalRef;
+	private modalRef: BsModalRef | null = null;
 
 	constructor(private modalService: BsModalService) {}
 

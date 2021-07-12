@@ -20,8 +20,8 @@ import { ConfigService } from './config.service';
 	styles: ['']
 })
 export class AboutComponent implements OnInit {
-	appTitle: string = undefined;
-	version: string = undefined;
+	appTitle?: string;
+	version?: string;
 
 	constructor(private configService: ConfigService) {}
 
@@ -29,9 +29,9 @@ export class AboutComponent implements OnInit {
 		this.configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
+			.subscribe(config => {
 				this.appTitle = config?.app?.title ?? '';
-				this.version = config.version;
+				this.version = config?.version ?? '';
 			});
 	}
 }

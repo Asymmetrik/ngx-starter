@@ -21,7 +21,7 @@ export class AccessComponent {
 
 	constructor(private router: Router) {
 		const navigation = this.router.getCurrentNavigation();
-		const state = navigation.extras.state;
+		const state = navigation?.extras?.state;
 
 		if (state) {
 			this.status = state.status;

@@ -8,13 +8,13 @@ import { SessionService } from './session.service';
 @UntilDestroy()
 @Injectable()
 export class AuthorizationService {
-	private session: Session;
+	private session: Session | null;
 
 	constructor(private sessionService: SessionService) {
 		this.sessionService
 			.getSession()
 			.pipe(untilDestroyed(this))
-			.subscribe((session: Session) => {
+			.subscribe(session => {
 				this.session = session;
 			});
 	}

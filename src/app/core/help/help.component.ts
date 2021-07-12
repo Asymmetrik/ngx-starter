@@ -7,9 +7,9 @@ import { untilDestroyed, UntilDestroy } from '@ngneat/until-destroy';
 import { filter } from 'rxjs/operators';
 import { HelpTopics } from './help-topic.component';
 
-export class HelpTopic {
+export interface HelpTopic {
 	id: string;
-	title: string;
+	title: string | null;
 }
 
 @UntilDestroy()

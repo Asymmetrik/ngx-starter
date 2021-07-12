@@ -33,7 +33,7 @@ export class SortControlsComponent {
 		// If the sort type changed, update
 		if (this.selectedKey !== this.sortOptions[key].sortField) {
 			this.selectedKey = this.sortOptions[key].sortField as string;
-			this.selectedDir = this.sortOptions[key].sortDir;
+			this.selectedDir = this.sortOptions[key].sortDir ?? SortDirection.asc;
 			this.sortChange.emit(this.sortOptions[key]);
 
 			// Otherwise, toggle the sort direction (if direction controls are enabled)

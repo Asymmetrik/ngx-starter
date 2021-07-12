@@ -3,6 +3,6 @@ export class SystemAlert {
 		public id: number,
 		public type: string,
 		public msg: string,
-		public subtext: string
+		public subtext?: string
 	) {}
 }

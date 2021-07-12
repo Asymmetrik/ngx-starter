@@ -8,8 +8,6 @@ import { TeamMember } from './team-member.model';
 import { TeamRole } from './team-role.model';
 import { Team } from './team.model';
 
-type TeamIdObj = Team | { _id: string };
-
 @UntilDestroy()
 @Injectable()
 export class TeamAuthorizationService {
@@ -20,8 +18,8 @@ export class TeamAuthorizationService {
 			.getSession()
 			.pipe(
 				first(),
-				map((session: Session) =>
-					new TeamMember().setFromTeamMemberModel(null, session.user.userModel)
+				map(session =>
+					new TeamMember().setFromTeamMemberModel(null, session?.user.userModel)
 				),
 				untilDestroyed(this)
 			)
@@ -34,37 +32,37 @@ export class TeamAuthorizationService {
 		return this.member.userModel.teams.length > 0;
 	}
 
-	public hasRole(team: TeamIdObj, role: string | TeamRole): boolean {
+	public hasRole(team: Pick<Team, '_id'>, role: string | TeamRole): boolean {
 		role = this.roleToString(role);
 		return this.member.getRoleInTeam(team) === role;
 	}
 
-	public hasAnyRole(team: TeamIdObj): boolean {
+	public hasAnyRole(team: Pick<Team, '_id'>): boolean {
 		return TeamRole.ROLES.some((role: TeamRole) => this.hasRole(team, role));
 	}
 
-	public hasSomeRoles(team: TeamIdObj, roles: Array<string | TeamRole>): boolean {
+	public hasSomeRoles(team: Pick<Team, '_id'>, roles: Array<string | TeamRole>): boolean {
 		return roles.some((role: string | TeamRole) => this.hasRole(team, role));
 	}
 
-	public hasEveryRole(team: TeamIdObj, roles: Array<string | TeamRole>): boolean {
+	public hasEveryRole(team: Pick<Team, '_id'>, roles: Array<string | TeamRole>): boolean {
 		return roles.every((role: string | TeamRole) => this.hasRole(team, role));
 		// return roles.reduce( (p: boolean, c: string) => p && this.hasRole(c), true);
 	}
 
-	public isMember(team: TeamIdObj): boolean {
+	public isMember(team: Pick<Team, '_id'>): boolean {
 		return this.hasRole(team, TeamRole.VIEW_ONLY.role);
 	}
 
-	public isEditor(team: TeamIdObj): boolean {
+	public isEditor(team: Pick<Team, '_id'>): boolean {
 		return this.hasRole(team, TeamRole.EDITOR.role);
 	}
 
-	public canManageResources(team: TeamIdObj): boolean {
+	public canManageResources(team: Pick<Team, '_id'>): boolean {
 		return this.isAdmin(team) || this.isEditor(team);
 	}
 
-	public isAdmin(team: TeamIdObj): boolean {
+	public isAdmin(team: Pick<Team, '_id'>): boolean {
 		return this.hasRole(team, TeamRole.ADMIN.role);
 	}
 

@@ -25,8 +25,8 @@ export class SigninComponent implements OnInit {
 		this.configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
-				this.pkiMode = config.auth.startsWith('proxy-pki');
+			.subscribe(config => {
+				this.pkiMode = config?.auth.startsWith('proxy-pki') ?? false;
 				this.loaded = true;
 
 				if (this.pkiMode) {

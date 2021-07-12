@@ -13,25 +13,16 @@ export class BreadcrumbService {
 	): Breadcrumb[] {
 		const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
 
-		// Get the child routes
-		const children: ActivatedRouteSnapshot[] = route.children;
+		// Find the primary route
+		const child = route.children.find(c => c.outlet === PRIMARY_OUTLET);
 
-		// Return if there are no more children
-		if (children.length === 0) {
+		// Return if there is no primary route
+		if (!child) {
 			return breadcrumbs;
 		}
 
-		for (const child of children) {
-			// Verify that this is a primary route
-			if (child.outlet !== PRIMARY_OUTLET) {
-				continue;
-			}
-
-			// Verify the custom data property "breadcrumb" is specified on the route
-			if (!child.data.hasOwnProperty(ROUTE_DATA_BREADCRUMB)) {
-				return this.getBreadcrumbs(child, url, breadcrumbs);
-			}
-
+		// If custom data property "breadcrumb" is specified on the route, add breadcrumb
+		if (child.data.hasOwnProperty(ROUTE_DATA_BREADCRUMB)) {
 			// Get the route's URL segment
 			const routeURL: string = child.url.map((segment: UrlSegment) => segment.path).join('/');
 
@@ -40,19 +31,14 @@ export class BreadcrumbService {
 
 			// Add breadcrumb
 			breadcrumbs.push({ label: child.data[ROUTE_DATA_BREADCRUMB], url });
-
-			return this.getBreadcrumbs(child, url, breadcrumbs);
 		}
+
+		return this.getBreadcrumbs(child, url, breadcrumbs);
 	}
 
 	static getBreadcrumbLabel(route: ActivatedRouteSnapshot): string {
 		const breadcrumbs: Breadcrumb[] = this.getBreadcrumbs(route);
 
-		if (breadcrumbs.length > 0) {
-			const firstBreadcrumb = breadcrumbs[0];
-			if (null != firstBreadcrumb) {
-				return firstBreadcrumb.label;
-			}
-		}
+		return breadcrumbs[0]?.label ?? '';
 	}
 }

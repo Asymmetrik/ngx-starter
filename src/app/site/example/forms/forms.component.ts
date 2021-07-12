@@ -12,7 +12,7 @@ import { delay, first } from 'rxjs/operators';
 export class FormsComponent {
 	fileSelected($event: Event) {
 		const target = $event.target as HTMLInputElement;
-		target.parentElement.setAttribute('data-after', target.files[0].name);
+		target.parentElement?.setAttribute('data-after', target?.files?.[0]?.name ?? '');
 	}
 
 	submit($event: Event) {

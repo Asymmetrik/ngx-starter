@@ -12,15 +12,15 @@ import { ConfigService } from '../config.service';
 	styleUrls: ['site-container.component.scss']
 })
 export class SiteContainerComponent {
-	bannerHtml: string = undefined;
-	copyrightHtml: string = undefined;
+	bannerHtml?: string;
+	copyrightHtml?: string;
 	showFeedbackFlyout = false;
 
 	constructor(private configService: ConfigService) {
 		configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
+			.subscribe(config => {
 				this.bannerHtml = config?.banner?.html;
 				this.copyrightHtml = config?.copyright?.html;
 				this.showFeedbackFlyout = config?.feedback?.showFlyout ?? false;
@@ -38,7 +38,7 @@ export class SiteContainerComponent {
 			skipTo.focus();
 		} else {
 			// fall back to main content area if no .skip-to elements are found
-			appContent.focus();
+			appContent?.focus();
 			window.scrollTo(0, 0);
 		}
 	}

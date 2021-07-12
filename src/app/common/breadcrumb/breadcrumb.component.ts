@@ -19,7 +19,7 @@ export class BreadcrumbComponent {
 		this.homeBreadcrumbChanged$.next(hb);
 	}
 	_homeBreadcrumb: Breadcrumb;
-	homeBreadcrumbChanged$: BehaviorSubject<Breadcrumb> = new BehaviorSubject(null);
+	homeBreadcrumbChanged$ = new BehaviorSubject<Breadcrumb | null>(null);
 
 	breadcrumbs: Breadcrumb[] = [];
 

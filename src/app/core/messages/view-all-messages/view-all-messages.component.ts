@@ -16,7 +16,7 @@ export class ViewAllMessagesComponent implements OnInit {
 	pageNumber = 0;
 	messages: Message[] = [];
 	loadMore = true;
-	search: string = null;
+	search = '';
 	newMessages = false;
 	messageType = MessageType;
 
@@ -63,7 +63,7 @@ export class ViewAllMessagesComponent implements OnInit {
 
 	loadNewMessages() {
 		this.newMessages = false;
-		this.search = null;
+		this.search = '';
 		this.searchInput.clearSearch();
 		this.pageNumber = 0;
 		this.loadMessages(this.pageNumber);

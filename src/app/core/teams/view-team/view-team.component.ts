@@ -26,7 +26,7 @@ export class ViewTeamComponent implements OnInit {
 	_team: any;
 
 	nestedTeamsEnabled = false;
-	implicitMembersStrategy: string = null;
+	implicitMembersStrategy?: string;
 
 	canManageTeam = false;
 
@@ -48,7 +48,7 @@ export class ViewTeamComponent implements OnInit {
 		this.configService
 			.getConfig()
 			.pipe(first(), untilDestroyed(this))
-			.subscribe((config: Config) => {
+			.subscribe(config => {
 				this.implicitMembersStrategy = config?.teams?.implicitMembers?.strategy;
 				this.nestedTeamsEnabled = config?.teams?.nestedTeams ?? false;
 			});
@@ -74,15 +74,17 @@ export class ViewTeamComponent implements OnInit {
 
 	saveEdit() {
 		this.teamsService
-			.update(this.team._id, this._team)
+			.update(this._team)
 			.pipe(
 				tap(() => this.authenticationService.reloadCurrentUser()),
 				untilDestroyed(this)
 			)
-			.subscribe((team: Team) => {
+			.subscribe(team => {
 				this.isEditing = false;
-				this.team = team;
-				this.alertService.addAlert('Updated team metadata', 'success', 5000);
+				if (team) {
+					this.team = team;
+					this.alertService.addAlert('Updated team metadata', 'success', 5000);
+				}
 			});
 	}
 
@@ -106,7 +108,7 @@ export class ViewTeamComponent implements OnInit {
 			.pipe(
 				first(),
 				filter(action => action === ModalAction.OK),
-				switchMap(() => this.teamsService.delete(this.team._id)),
+				switchMap(() => this.teamsService.delete(this.team)),
 				tap(() => this.authenticationService.reloadCurrentUser()),
 				catchError((error: HttpErrorResponse) => {
 					this.alertService.addClientErrorAlert(error);

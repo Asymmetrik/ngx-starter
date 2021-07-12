@@ -95,7 +95,7 @@ export class AdminListEuasComponent extends AbstractPageableDataComponent<EndUse
 
 		this.headersToShow = this.headers.filter(
 			(header: SortableTableHeader) =>
-				this.columns.hasOwnProperty(header.sortField) && this.columns[header.sortField].show
+				header.sortField && this.columns?.[header.sortField].show
 		);
 
 		this.sortEvent$.next(this.headers.find((header: any) => header.default) as SortChange);
@@ -108,7 +108,8 @@ export class AdminListEuasComponent extends AbstractPageableDataComponent<EndUse
 	columnsUpdated(updatedColumns: ColumnConfig) {
 		this.columns = cloneDeep(updatedColumns);
 		this.headersToShow = this.headers.filter(
-			(header: SortableTableHeader) => this.columns?.[header.sortField].show
+			(header: SortableTableHeader) =>
+				header.sortField && this.columns?.[header.sortField].show
 		);
 	}
 
